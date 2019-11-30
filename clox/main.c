@@ -6,41 +6,89 @@
 //  Copyright © 2019 Hormes, Grayden. All rights reserved.
 //
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "common.h"
 #include "chunk.h"
 #include "debug.h"
 #include "vm.h"
 
-int main(int argc, const char* argv[]) {
+void repl() {
 	VM vm;
 	initVM(&vm);
 	
-  Chunk chunk;
-  initChunk(&chunk);
-  
-  int constant = addConstant(&chunk, 1.2);
-	writeChunk(&chunk, OP_CONSTANT, 123);
-  writeChunk(&chunk, constant, 123);
-	
-  constant = addConstant(&chunk, 3.4);
-  writeChunk(&chunk, OP_CONSTANT, 123);
-  writeChunk(&chunk, constant, 123);
+  char line[1024];
+  for (;;) {
+    printf("> ");
 
-  writeChunk(&chunk, OP_ADD, 123);
+    if (!fgets(line, sizeof(line), stdin)) {
+      printf("\n");
+      break;
+    }
 
-  constant = addConstant(&chunk, 5.6);
-  writeChunk(&chunk, OP_CONSTANT, 123);
-  writeChunk(&chunk, constant, 123);
-
-  writeChunk(&chunk, OP_DIVIDE, 123);
-	writeChunk(&chunk, OP_NEGATE, 123);
-
-  writeChunk(&chunk, OP_RETURN, 123);
-	
-	interpret(&vm, &chunk);
+    interpret(&vm, line);
+  }
 	
 	freeVM(&vm);
-  freeChunk(&chunk); 
+}
+
+char* readFile(const char* path) {
+  FILE* file = fopen(path, "rb");
+  if (file == NULL) {
+    fprintf(stderr, "Could not open file \"%s\".\n", path);
+    exit(74);
+  }
+	
+  fseek(file, 0L, SEEK_END);
+  size_t fileSize = ftell(file);
+  rewind(file);
+
+  char* buffer = (char*)malloc(fileSize + 1);
+  if (buffer == NULL) {
+    fprintf(stderr, "Not enough memory to read \"%s\".\n", path);
+    exit(74);
+  }
+	
+  size_t bytesRead = fread(buffer, sizeof(char), fileSize, file);
+  if (bytesRead < fileSize) {
+    fprintf(stderr, "Could not read file \"%s\".\n", path);
+    exit(74);
+  }
+	
+  buffer[bytesRead] = '\0';
+
+  fclose(file);
+  return buffer;
+}
+
+void runFile(const char* path) {
+	VM vm;
+	initVM(&vm);
+	
+  char* source = readFile(path);
+  InterpretResult result = interpret(&vm, source);
   
-  return 0;
+	free(source);
+	freeVM(&vm);
+
+	if (result == INTERPRET_COMPILE_ERROR) {
+		exit(65);
+	} else if (result == INTERPRET_RUNTIME_ERROR) {
+		exit(70);
+	}
+}
+
+int main(int argc, const char* argv[]) {
+  if (argc == 1) {
+    repl();
+  } else if (argc == 2) {
+    runFile(argv[1]);
+  } else {
+    fprintf(stderr, "Usage: clox [path]\n");
+    exit(64);
+  }
+
+	return 0;
 }

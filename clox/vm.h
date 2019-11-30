@@ -32,6 +32,6 @@ void initVM(VM* vm);
 void freeVM(VM* vm);
 void push(VM* vm, Value value);
 Value pop(VM* vm);
-InterpretResult interpret(VM* vm, Chunk* chunk);
+InterpretResult interpret(VM* vm, const char* source);
 
 #endif /* vm_h */

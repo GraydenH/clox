@@ -10,6 +10,7 @@
 
 #include "common.h"
 #include "vm.h"
+#include "compiler.h"
 #include "debug.h"
 
 InterpretResult run(VM* vm) {
@@ -80,8 +81,7 @@ Value pop(VM* vm) {
 	return *vm->stackTop;
 }
 
-InterpretResult interpret(VM* vm, Chunk* chunk) {
-  vm->chunk = chunk;
-  vm->ip = vm->chunk->code;
-  return run(vm);
+InterpretResult interpret(VM* vm, const char* source) {
+	compile(source);
+	return INTERPRET_OK;
 }        
