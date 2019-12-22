@@ -1,2 +1,7 @@
 .DS_STORE
 *.xcuserstate
+*/xcuserdata/*
+
+.idea/
+
+clox.xcodeproj/
