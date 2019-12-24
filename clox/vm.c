@@ -14,7 +14,6 @@
 #include "compiler.h"
 #include "debug.h"
 
-
 Value peek(VM* vm, int distance) {
   return vm->stackTop[-1 - distance];
 }
@@ -35,6 +34,10 @@ void runtimeError(VM* vm, const char* format, ...) {
   fprintf(stderr, "[line %d] in script\n", line);
 
   resetStack(vm);
+}
+
+static bool isFalsey(Value value) {
+  return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
 }
 
 InterpretResult run(VM* vm) {
@@ -78,6 +81,14 @@ InterpretResult run(VM* vm) {
       case OP_SUBTRACT: BINARY_OP(NUMBER_VAL, -); break;
       case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *); break;
       case OP_DIVIDE: BINARY_OP(NUMBER_VAL, /); break;
+			case OP_GREATER: BINARY_OP(BOOL_VAL, >); break;
+			case OP_LESS: BINARY_OP(BOOL_VAL, <); break;
+			case OP_EQUAL: {
+				Value b = pop(vm);
+				Value a = pop(vm);
+				push(vm, BOOL_VAL(valuesEqual(a, b)));
+				break;
+			}
       case OP_NOT:
         push(vm, BOOL_VAL(isFalsey(pop(vm))));
         break;
