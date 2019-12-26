@@ -16,8 +16,7 @@
 #include "vm.h"
 
 void repl() {
-	VM vm;
-	initVM(&vm);
+	initVM();
 	
   char line[1024];
   for (;;) {
@@ -28,10 +27,10 @@ void repl() {
       break;
     }
 
-    interpret(&vm, line);
+    interpret(line);
   }
 	
-	freeVM(&vm);
+	freeVM();
 }
 
 char* readFile(const char* path) {
@@ -64,14 +63,13 @@ char* readFile(const char* path) {
 }
 
 void runFile(const char* path) {
-	VM vm;
-	initVM(&vm);
+	initVM();
 	
   char* source = readFile(path);
-  InterpretResult result = interpret(&vm, source);
+  InterpretResult result = interpret(source);
   
 	free(source);
-	freeVM(&vm);
+	freeVM();
 
 	if (result == INTERPRET_COMPILE_ERROR) {
 		exit(65);

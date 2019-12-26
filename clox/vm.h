@@ -19,7 +19,11 @@ typedef struct {
 	uint8_t* ip;
   Value stack[STACK_MAX];
   Value* stackTop;
+	
+  Obj* objects;   
 } VM;
+
+extern VM vm;
 
 typedef enum {
   INTERPRET_OK,
@@ -28,10 +32,10 @@ typedef enum {
 } InterpretResult;
 
 
-void initVM(VM* vm);
-void freeVM(VM* vm);
-void push(VM* vm, Value value);
-Value pop(VM* vm);
-InterpretResult interpret(VM* vm, const char* source);
+void initVM(void);
+void freeVM(void);
+void push(Value value);
+Value pop(void);
+InterpretResult interpret(const char* source);
 
 #endif /* vm_h */

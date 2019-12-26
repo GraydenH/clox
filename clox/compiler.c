@@ -50,6 +50,7 @@ static void binary(void);
 static void number(void);
 static void grouping(void);
 static void literal(void);
+static void string(void);
 
 ParseRule rules[] = {
   { grouping, NULL,    PREC_NONE },       // TOKEN_LEFT_PAREN
@@ -72,7 +73,7 @@ ParseRule rules[] = {
   { NULL,     binary,  PREC_COMPARISON }, // TOKEN_LESS
   { NULL,     binary,  PREC_COMPARISON }, // TOKEN_LESS_EQUAL
   { NULL,     NULL,    PREC_NONE },       // TOKEN_IDENTIFIER
-  { NULL,     NULL,    PREC_NONE },       // TOKEN_STRING
+  { string,   NULL,    PREC_NONE },       // TOKEN_STRING
   { number,   NULL,    PREC_NONE },       // TOKEN_NUMBER
   { NULL,     NULL,    PREC_NONE },       // TOKEN_AND
   { NULL,     NULL,    PREC_NONE },       // TOKEN_CLASS
@@ -164,6 +165,12 @@ static void endCompiler() {
 		disassembleChunk(currentChunk(), "code");
 	}
 #endif
+}
+
+static void string() {
+	emitConstant(OBJ_VAL(copyString(
+			parser.previous.start + 1,
+			parser.previous.length - 2)));
 }
 
 static void number() {
