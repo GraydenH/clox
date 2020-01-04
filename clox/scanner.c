@@ -36,7 +36,7 @@ char advance() {
  return scanner.current[-1];
 }
 
-bool match(char expected) {
+bool matchTokenType(char expected) {
 	if (isAtEnd()) {
 		return false;
 	} else if (*scanner.current != expected) {
@@ -228,13 +228,13 @@ Token scanToken() {
     case '/': return makeToken(TOKEN_SLASH);
     case '*': return makeToken(TOKEN_STAR);
     case '!':
-      return makeToken(match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
+      return makeToken(matchTokenType('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
     case '=':
-      return makeToken(match('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
+      return makeToken(matchTokenType('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
     case '<':
-      return makeToken(match('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
+      return makeToken(matchTokenType('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
     case '>':
-      return makeToken(match('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+      return makeToken(matchTokenType('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
 		case '"': return string();
   }
 	
